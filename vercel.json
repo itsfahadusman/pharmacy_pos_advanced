@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "pharmacy_pos_advanced/app.py",
+      "src": "pharmacy_pos_advanced/main.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "pharmacy_pos_advanced/app.py"
+      "dest": "pharmacy_pos_advanced/main.py"
     }
   ]
 }
