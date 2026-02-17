@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+
+{% block title %}Point of Sale - Pharmacy POS{% endblock %}
+{% block page_title %}Point of Sale{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Medicine Selection -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-capsule"></i> Select Medicines
+            </div>
+            <div class="card-body">
+                <!-- Search -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <input type="text" id="medicineSearch" class="form-control" 
+                               placeholder="Search by name, brand, or barcode..." 
+                               onkeyup="searchTable('medicineSearch', 'medicineTable')">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="barcodeInput" class="form-control" 
+                               placeholder="Scan barcode..." onchange="addByBarcode()">
+                    </div>
+                </div>
+                
+                <!-- Medicines Table -->
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-hover" id="medicineTable">
+                        <thead class="sticky-top">
+                            <tr>
+                                <th>Name</th>
+                                <th>Brand</th>
+                                <th>Stock</th>
+                                <th>Price</th>
+                                <th>Expiry</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in medicines %}
+                            <tr>
+                                <td>
+                                    <strong>{{ med.name }}</strong>
+                                    {% if med.generic_name %}
+                                    <br><small class="text-muted">{{ med.generic_name }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ med.brand }}</td>
+                                <td>
+                                    <span class="badge {% if med.quantity < med.reorder_level %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ med.quantity }}
+                                    </span>
+                                </td>
+                                <td><strong>₨ {{ "%.2f"|format(med.price) }}</strong></td>
+                                <td><small>{{ med.expiry_date }}</small></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" 
+                                            onclick="addToCart({{ med.id }}, '{{ med.name }}', {{ med.price }}, {{ med.quantity }})">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cart -->
+    <div class="col-lg-4">
+        <div class="card sticky-top" style="top: 80px;">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-cart3"></i> Cart
+            </div>
+            <div class="card-body">
+                <!-- Customer Selection -->
+                <div class="mb-3">
+                    <label class="form-label">Customer (Optional)</label>
+                    <select class="form-select form-select-sm" id="customerId">
+                        <option value="">Walk-in Customer</option>
+                        {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Cart Items -->
+                <div id="cartItems" style="max-height: 300px; overflow-y: auto;">
+                    <p class="text-center text-muted">Cart is empty</p>
+                </div>
+                
+                <!-- Totals -->
+                <hr>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Subtotal:</span>
+                        <strong id="subtotal">₨ 0.00</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Discount:</span>
+                        <strong id="discountAmount">₨ 0.00</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Tax (5%):</span>
+                        <strong id="taxAmount">₨ 0.00</strong>
+                    </div>
+                </div>
+                <hr>
+                <div class="cart-total mb-3">
+                    <div>Total</div>
+                    <div id="grandTotal">₨ 0.00</div>
+                </div>
+                
+                <!-- Payment Method -->
+                <div class="mb-3">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-select" id="paymentMethod">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="credit">Credit</option>
+                    </select>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success btn-lg" onclick="processCheckout()" id="checkoutBtn">
+                        <i class="bi bi-check-circle"></i> Process Sale
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="clearCart()">
+                        <i class="bi bi-x-circle"></i> Clear Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-receipt"></i> Sale Completed</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="invoiceContent">
+                <!-- Invoice content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="printInvoice()">
+                    <i class="bi bi-printer"></i> Print
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let cart = [];
+
+function addToCart(id, name, price, maxQty) {
+    const existing = cart.find(item => item.medicine_id === id);
+    
+    if (existing) {
+        if (existing.quantity < maxQty) {
+            existing.quantity++;
+            updateCart();
+        } else {
+            alert('Insufficient stock!');
+        }
+    } else {
+        cart.push({
+            medicine_id: id,
+            name: name,
+            price: price,
+            quantity: 1,
+            discount: 0,
+            maxQty: maxQty
+        });
+        updateCart();
+    }
+}
+
+function updateCart() {
+    const cartItems = document.getElementById('cartItems');
+    
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="text-center text-muted">Cart is empty</p>';
+        updateTotals();
+        return;
+    }
+    
+    let html = '';
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity * (1 - item.discount / 100);
+        html += `
+            <div class="cart-item mb-2">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <strong>${item.name}</strong>
+                    <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-4">
+                        <input type="number" class="form-control form-control-sm" 
+                               value="${item.quantity}" min="1" max="${item.maxQty}"
+                               onchange="updateQuantity(${index}, this.value)">
+                    </div>
+                    <div class="col-4">
+                        <input type="number" class="form-control form-control-sm" 
+                               placeholder="Disc%" value="${item.discount}" min="0" max="100"
+                               onchange="updateDiscount(${index}, this.value)">
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control form-control-sm" 
+                               value="₨ ${itemTotal.toFixed(2)}" readonly>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    cartItems.innerHTML = html;
+    updateTotals();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCart();
+}
+
+function updateQuantity(index, qty) {
+    const quantity = parseInt(qty);
+    if (quantity > 0 && quantity <= cart[index].maxQty) {
+        cart[index].quantity = quantity;
+        updateCart();
+    } else {
+        alert('Invalid quantity!');
+        updateCart();
+    }
+}
+
+function updateDiscount(index, discount) {
+    const disc = parseFloat(discount);
+    if (disc >= 0 && disc <= 100) {
+        cart[index].discount = disc;
+        updateCart();
+    } else {
+        alert('Discount must be between 0 and 100!');
+        updateCart();
+    }
+}
+
+function updateTotals() {
+    let subtotal = 0;
+    let totalDiscount = 0;
+    
+    cart.forEach(item => {
+        const itemSubtotal = item.price * item.quantity;
+        subtotal += itemSubtotal;
+        totalDiscount += itemSubtotal * (item.discount / 100);
+    });
+    
+    const taxableAmount = subtotal - totalDiscount;
+    const tax = taxableAmount * 0.05; // 5% tax
+    const grandTotal = taxableAmount + tax;
+    
+    document.getElementById('subtotal').textContent = '₨ ' + subtotal.toFixed(2);
+    document.getElementById('discountAmount').textContent = '₨ ' + totalDiscount.toFixed(2);
+    document.getElementById('taxAmount').textContent = '₨ ' + tax.toFixed(2);
+    document.getElementById('grandTotal').textContent = '₨ ' + grandTotal.toFixed(2);
+}
+
+function clearCart() {
+    if (cart.length > 0 && confirm('Are you sure you want to clear the cart?')) {
+        cart = [];
+        updateCart();
+    }
+}
+
+function processCheckout() {
+    if (cart.length === 0) {
+        alert('Cart is empty!');
+        return;
+    }
+    
+    const customerId = document.getElementById('customerId').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    
+    fetch('/pos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            items: cart,
+            customer_id: customerId,
+            payment_method: paymentMethod
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showInvoice(data.invoice_number, data.total_amount);
+            cart = [];
+            updateCart();
+        } else {
+            alert('Error: ' + data.message);
+        }
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML = '<i class="bi bi-check-circle"></i> Process Sale';
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML = '<i class="bi bi-check-circle"></i> Process Sale';
+    });
+}
+
+function showInvoice(invoiceNumber, totalAmount) {
+    const invoiceContent = `
+        <div class="text-center mb-4">
+            <h2><i class="bi bi-check-circle-fill text-success"></i></h2>
+            <h4>Sale Completed Successfully!</h4>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <p><strong>Invoice Number:</strong><br>${invoiceNumber}</p>
+            </div>
+            <div class="col-6">
+                <p><strong>Total Amount:</strong><br>₨ ${totalAmount.toFixed(2)}</p>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <p class="text-muted">Thank you for your business!</p>
+        </div>
+    `;
+    
+    document.getElementById('invoiceContent').innerHTML = invoiceContent;
+    const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+    modal.show();
+}
+
+function printInvoice() {
+    window.print();
+}
+
+function addByBarcode() {
+    const barcode = document.getElementById('barcodeInput').value;
+    // Search for medicine by barcode and add to cart
+    // This would require additional AJAX call to fetch medicine details
+    document.getElementById('barcodeInput').value = '';
+}
+</script>
+{% endblock %}

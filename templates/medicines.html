@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Medicines - Pharmacy POS{% endblock %}
+{% block page_title %}Medicine Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-capsule"></i> All Medicines</span>
+        <div>
+            <a href="{{ url_for('import_medicines') }}" class="btn btn-success me-2">
+                <i class="bi bi-cloud-upload"></i> Import CSV
+            </a>
+            <a href="{{ url_for('add_medicine') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Medicine
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Search and Filter -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" placeholder="Search medicines..." 
+                       value="{{ search }}" onchange="location.href='{{ url_for('medicines') }}?search=' + this.value">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" onchange="location.href='{{ url_for('medicines') }}?category=' + this.value">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.category }}" {% if selected_category == cat.category %}selected{% endif %}>
+                        {{ cat.category }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('export_inventory') }}" class="btn btn-outline-success w-100">
+                    <i class="bi bi-download"></i> Export
+                </a>
+            </div>
+        </div>
+        
+        <!-- Medicines Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name / Generic</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Stock</th>
+                        <th>Price</th>
+                        <th>Expiry</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in medicines %}
+                    <tr>
+                        <td>
+                            <strong>{{ med.name }}</strong>
+                            {% if med.generic_name %}<br><small class="text-muted">{{ med.generic_name }}</small>{% endif %}
+                        </td>
+                        <td>{{ med.brand }}</td>
+                        <td><span class="badge bg-secondary">{{ med.category }}</span></td>
+                        <td>
+                            <span class="badge {% if med.quantity < med.reorder_level %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ med.quantity }}
+                            </span>
+                        </td>
+                        <td><strong>₨ {{ "%.2f"|format(med.price) }}</strong></td>
+                        <td><small>{{ med.expiry_date }}</small></td>
+                        <td>
+                            <a href="{{ url_for('edit_medicine', med_id=med.id) }}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ url_for('delete_medicine', med_id=med.id) }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Delete {{ med.name }}?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

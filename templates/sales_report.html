@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Sales Report{% endblock %}
+{% block page_title %}Sales Report{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><i class="bi bi-graph-up"></i> Sales Report</div>
+    <div class="card-body">
+        <form method="GET" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" name="end_date" value="{{ end_date }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filter</button>
+                </div>
+            </div>
+        </form>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3>₨ {{ "%.2f"|format(total_sales) }}</h3>
+                        <p class="mb-0">Total Sales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3>{{ total_items }}</h3>
+                        <p class="mb-0">Items Sold</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('export_sales', start_date=start_date, end_date=end_date) }}" class="btn btn-outline-success w-100" style="height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-download me-2"></i> Export CSV
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Invoice</th><th>Medicine</th><th>Customer</th><th>Qty</th><th>Price</th><th>Discount</th><th>Tax</th><th>Total</th><th>Payment</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td><small>{{ sale.invoice_number }}</small></td>
+                        <td>{{ sale.medicine_name }}</td>
+                        <td>{{ sale.customer_name or 'Walk-in' }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>₨ {{ "%.2f"|format(sale.unit_price) }}</td>
+                        <td>{{ sale.discount }}%</td>
+                        <td>₨ {{ "%.2f"|format(sale.tax) }}</td>
+                        <td><strong>₨ {{ "%.2f"|format(sale.total_price) }}</strong></td>
+                        <td><span class="badge bg-info">{{ sale.payment_method }}</span></td>
+                        <td><small>{{ sale.sale_date }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

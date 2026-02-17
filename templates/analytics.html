@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block page_title %}Sales Analytics{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> Sales by Category</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead><tr><th>Category</th><th>Quantity</th><th>Revenue</th></tr></thead>
+                    <tbody>
+                        {% for cat in sales_by_category %}
+                        <tr><td>{{ cat.category }}</td><td>{{ cat.total_quantity }}</td><td><strong>₨ {{ "%.2f"|format(cat.total_sales) }}</strong></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-trophy"></i> Top Selling Medicines</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead><tr><th>Medicine</th><th>Units Sold</th><th>Revenue</th></tr></thead>
+                    <tbody>
+                        {% for med in top_medicines %}
+                        <tr><td>{{ med.name }}</td><td><span class="badge bg-success">{{ med.total_sold }}</span></td><td><strong>₨ {{ "%.2f"|format(med.revenue) }}</strong></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header"><i class="bi bi-graph-up"></i> Daily Sales Trend (Last 30 Days)</div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Date</th><th>Sales</th></tr></thead>
+            <tbody>
+                {% for day in daily_sales %}
+                <tr><td>{{ day.date }}</td><td>₨ {{ "%.2f"|format(day.total) }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

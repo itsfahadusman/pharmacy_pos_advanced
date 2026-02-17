@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Purchase Orders{% endblock %}
+{% block page_title %}Purchase Orders{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <span><i class="bi bi-file-earmark-text"></i> All Purchase Orders</span>
+        <a href="{{ url_for('create_po') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create PO</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead><tr><th>PO Number</th><th>Supplier</th><th>Order Date</th><th>Expected Delivery</th><th>Status</th><th>Total</th></tr></thead>
+                <tbody>
+                    {% for po in purchase_orders %}
+                    <tr>
+                        <td><strong>{{ po.po_number }}</strong></td>
+                        <td>{{ po.supplier_name }}</td>
+                        <td>{{ po.order_date }}</td>
+                        <td>{{ po.expected_delivery }}</td>
+                        <td><span class="badge bg-{{ 'success' if po.status == 'received' else 'warning' }}">{{ po.status }}</span></td>
+                        <td><strong>₨ {{ "%.2f"|format(po.total_amount) }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

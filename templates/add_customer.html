@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Add Customer{% endblock %}
+{% block page_title %}Add New Customer{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-person-plus"></i> Customer Information</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" name="date_of_birth">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Medical History</label>
+                        <textarea class="form-control" name="medical_history" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Allergies</label>
+                        <input type="text" class="form-control" name="allergies" placeholder="Penicillin, Aspirin, etc.">
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('customers') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+                        <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

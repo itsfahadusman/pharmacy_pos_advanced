@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}Import Medicines - Pharmacy POS{% endblock %}
+{% block page_title %}Import Medicines from CSV{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        
+        <!-- Instructions Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-info-circle"></i> How to Import Medicines
+            </div>
+            <div class="card-body">
+                <h6>Step 1: Download Template</h6>
+                <p>Download the sample CSV template file to see the correct format.</p>
+                <a href="{{ url_for('download_sample_csv') }}" class="btn btn-success mb-3">
+                    <i class="bi bi-download"></i> Download Sample CSV Template
+                </a>
+                
+                <h6>Step 2: Prepare Your Data</h6>
+                <p>Open the template in Excel/Google Sheets and fill in your medicine data:</p>
+                <ul>
+                    <li><strong>Required fields:</strong> name, brand, price</li>
+                    <li><strong>Optional fields:</strong> generic_name, category, quantity, etc.</li>
+                    <li><strong>Date format:</strong> YYYY-MM-DD (e.g., 2026-12-31)</li>
+                    <li><strong>Prescription:</strong> Use 1 for required, 0 for not required</li>
+                    <li><strong>Barcode:</strong> Must be unique if provided</li>
+                </ul>
+                
+                <h6>Step 3: Upload CSV File</h6>
+                <p>Save your file as CSV and upload it below.</p>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> <strong>Important:</strong>
+                    <ul class="mb-0">
+                        <li>Make sure column headers match exactly</li>
+                        <li>Don't include extra columns</li>
+                        <li>Check for duplicate barcodes</li>
+                        <li>Verify date formats</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upload Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-cloud-upload"></i> Upload CSV File
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="form-label">Select CSV File</label>
+                        <input type="file" class="form-control form-control-lg" name="file" accept=".csv" required>
+                        <div class="form-text">Only CSV files are accepted. Maximum file size: 16MB</div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-lightbulb"></i> CSV Format Example:</h6>
+                        <code style="font-size: 12px;">
+                            name,generic_name,brand,category,quantity,reorder_level,cost_price,price,expiry_date,barcode,batch_number,rack_location,description,requires_prescription<br>
+                            Paracetamol 500mg,Acetaminophen,Calpol,Painkiller,100,20,5.50,10.00,2026-12-31,8901234567890,BATCH001,A-1-5,For fever and pain relief,0
+                        </code>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('medicines') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Medicines
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-upload"></i> Import Medicines
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Field Reference Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="bi bi-table"></i> CSV Field Reference
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Field Name</th>
+                                <th>Required?</th>
+                                <th>Format</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td><span class="badge bg-danger">Required</span></td>
+                                <td>Text</td>
+                                <td>Paracetamol 500mg</td>
+                            </tr>
+                            <tr>
+                                <td><code>generic_name</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Text</td>
+                                <td>Acetaminophen</td>
+                            </tr>
+                            <tr>
+                                <td><code>brand</code></td>
+                                <td><span class="badge bg-danger">Required</span></td>
+                                <td>Text</td>
+                                <td>Calpol</td>
+                            </tr>
+                            <tr>
+                                <td><code>category</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Text</td>
+                                <td>Painkiller</td>
+                            </tr>
+                            <tr>
+                                <td><code>quantity</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Number</td>
+                                <td>100</td>
+                            </tr>
+                            <tr>
+                                <td><code>reorder_level</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Number</td>
+                                <td>20</td>
+                            </tr>
+                            <tr>
+                                <td><code>cost_price</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Decimal</td>
+                                <td>5.50</td>
+                            </tr>
+                            <tr>
+                                <td><code>price</code></td>
+                                <td><span class="badge bg-danger">Required</span></td>
+                                <td>Decimal</td>
+                                <td>10.00</td>
+                            </tr>
+                            <tr>
+                                <td><code>expiry_date</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>YYYY-MM-DD</td>
+                                <td>2026-12-31</td>
+                            </tr>
+                            <tr>
+                                <td><code>barcode</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Text (Unique)</td>
+                                <td>8901234567890</td>
+                            </tr>
+                            <tr>
+                                <td><code>batch_number</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Text</td>
+                                <td>BATCH001</td>
+                            </tr>
+                            <tr>
+                                <td><code>rack_location</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Text</td>
+                                <td>A-1-5</td>
+                            </tr>
+                            <tr>
+                                <td><code>description</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Text</td>
+                                <td>For fever and pain</td>
+                            </tr>
+                            <tr>
+                                <td><code>requires_prescription</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>0 or 1</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

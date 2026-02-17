@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Pharmacy POS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <h6>Total Medicines</h6>
+                <div class="h2 mb-0">{{ total_medicines }}</div>
+                <a href="{{ url_for('medicines') }}" class="small text-decoration-none">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <h6>Low Stock Items</h6>
+                <div class="h2 mb-0">{{ low_stock }}</div>
+                <a href="{{ url_for('low_stock') }}" class="small text-decoration-none">
+                    View Details <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card danger">
+            <div class="card-body">
+                <h6>Expired Medicines</h6>
+                <div class="h2 mb-0">{{ expired }}</div>
+                <a href="{{ url_for('expired_medicines') }}" class="small text-decoration-none">
+                    View Details <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <h6>Expiring Soon (30 Days)</h6>
+                <div class="h2 mb-0">{{ expiring_soon }}</div>
+                <a href="{{ url_for('expired_medicines') }}" class="small text-decoration-none">
+                    View Details <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Statistics -->
+<div class="row">
+    <div class="col-xl-6 mb-4">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <h6>Today's Sales</h6>
+                <div class="h2 mb-0">₨ {{ "%.2f"|format(today_sales) }}</div>
+                <a href="{{ url_for('sales_report') }}" class="small text-decoration-none">
+                    View Report <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-6 mb-4">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <h6>This Month's Sales</h6>
+                <div class="h2 mb-0">₨ {{ "%.2f"|format(month_sales) }}</div>
+                <a href="{{ url_for('sales_report') }}" class="small text-decoration-none">
+                    View Report <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning-charge"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('pos') }}" class="btn btn-primary w-100">
+                            <i class="bi bi-cart-check"></i> New Sale
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('add_medicine') }}" class="btn btn-success w-100">
+                            <i class="bi bi-plus-circle"></i> Add Medicine
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('add_customer') }}" class="btn btn-info w-100">
+                            <i class="bi bi-person-plus"></i> Add Customer
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('create_po') }}" class="btn btn-warning w-100">
+                            <i class="bi bi-file-earmark-plus"></i> New PO
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sales and Notifications -->
+<div class="row">
+    <div class="col-xl-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-history"></i> Recent Sales</span>
+                <a href="{{ url_for('sales_report') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_sales %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Medicine</th>
+                                <th>Customer</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in recent_sales %}
+                            <tr>
+                                <td><small>{{ sale.invoice_number }}</small></td>
+                                <td>{{ sale.name }}</td>
+                                <td>{{ sale.customer_name or 'Walk-in' }}</td>
+                                <td>{{ sale.quantity }}</td>
+                                <td><strong>₨ {{ "%.2f"|format(sale.total_price) }}</strong></td>
+                                <td><small>{{ sale.sale_date }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted my-4">No recent sales</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-4 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-bell"></i> Notifications</span>
+                <a href="{{ url_for('notifications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if notifications %}
+                <div class="list-group list-group-flush">
+                    {% for notif in notifications %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                {% if notif.type == 'low_stock' %}
+                                <i class="bi bi-exclamation-triangle text-warning"></i>
+                                {% elif notif.type == 'expired' %}
+                                <i class="bi bi-x-circle text-danger"></i>
+                                {% else %}
+                                <i class="bi bi-info-circle text-info"></i>
+                                {% endif %}
+                                {{ notif.type|title }}
+                            </h6>
+                            <small>{{ notif.created_at }}</small>
+                        </div>
+                        <p class="mb-1 small">{{ notif.message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-muted my-4">No new notifications</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

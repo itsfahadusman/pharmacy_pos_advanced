@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Low Stock{% endblock %}
+{% block page_title %}Low Stock Items{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header bg-warning"><i class="bi bi-exclamation-triangle"></i> Medicines Below Reorder Level</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Medicine</th><th>Brand</th><th>Current Stock</th><th>Reorder Level</th><th>Supplier</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    {% for med in medicines %}
+                    <tr>
+                        <td><strong>{{ med.name }}</strong></td>
+                        <td>{{ med.brand }}</td>
+                        <td><span class="badge bg-danger">{{ med.quantity }}</span></td>
+                        <td>{{ med.reorder_level }}</td>
+                        <td>{{ med.supplier_name or '-' }}</td>
+                        <td><a href="#" class="btn btn-sm btn-primary"><i class="bi bi-cart-plus"></i> Order</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

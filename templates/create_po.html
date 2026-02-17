@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Create PO{% endblock %}
+{% block page_title %}Create Purchase Order{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><i class="bi bi-file-earmark-plus"></i> New Purchase Order</div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Supplier *</label>
+                <select class="form-select" id="supplierId" required>
+                    <option value="">Select Supplier</option>
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Order Date *</label>
+                <input type="date" class="form-control" id="orderDate" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Expected Delivery</label>
+                <input type="date" class="form-control" id="expectedDelivery">
+            </div>
+        </div>
+        <h5>Add Items</h5>
+        <div class="row mb-2">
+            <div class="col-md-5">
+                <select class="form-select" id="medicineSelect">
+                    <option value="">Select Medicine</option>
+                    {% for med in medicines %}
+                    <option value="{{ med.id }}" data-name="{{ med.name }}" data-price="{{ med.cost_price or med.price }}">{{ med.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2"><input type="number" class="form-control" id="poQty" placeholder="Qty"></div>
+            <div class="col-md-3"><input type="number" class="form-control" id="poPrice" placeholder="Unit Price"></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" onclick="addPOItem()">Add</button></div>
+        </div>
+        <div id="poItems"></div>
+        <div class="text-end mt-3">
+            <h4>Total: ₨ <span id="poTotal">0.00</span></h4>
+        </div>
+        <textarea class="form-control mb-3" id="poNotes" placeholder="Notes"></textarea>
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('purchase_orders') }}" class="btn btn-secondary">Cancel</a>
+            <button class="btn btn-success" onclick="submitPO()">Create PO</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+let poItems = [];
+function addPOItem() {
+    const select = document.getElementById('medicineSelect');
+    const qty = parseInt(document.getElementById('poQty').value);
+    const price = parseFloat(document.getElementById('poPrice').value);
+    if (select.value && qty > 0 && price > 0) {
+        const option = select.options[select.selectedIndex];
+        poItems.push({medicine_id: select.value, name: option.dataset.name, quantity: qty, unit_price: price});
+        updatePOItems();
+        document.getElementById('poQty').value = '';
+        document.getElementById('poPrice').value = '';
+    }
+}
+function updatePOItems() {
+    let html = '<table class="table"><thead><tr><th>Medicine</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody>';
+    let total = 0;
+    poItems.forEach((item, i) => {
+        const itemTotal = item.quantity * item.unit_price;
+        total += itemTotal;
+        html += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>₨${item.unit_price}</td><td>₨${itemTotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger" onclick="poItems.splice(${i},1);updatePOItems()">×</button></td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('poItems').innerHTML = html;
+    document.getElementById('poTotal').textContent = total.toFixed(2);
+}
+function submitPO() {
+    fetch('/create_po', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            supplier_id: document.getElementById('supplierId').value,
+            order_date: document.getElementById('orderDate').value,
+            expected_delivery: document.getElementById('expectedDelivery').value,
+            total_amount: parseFloat(document.getElementById('poTotal').textContent),
+            notes: document.getElementById('poNotes').value,
+            items: poItems
+        })
+    }).then(r => r.json()).then(d => {
+        if (d.success) { alert('PO Created: ' + d.po_number); location.href = '/purchase_orders'; }
+        else alert('Error: ' + d.message);
+    });
+}
+</script>
+{% endblock %}

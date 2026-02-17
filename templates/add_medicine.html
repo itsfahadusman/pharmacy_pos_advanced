@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Add Medicine - Pharmacy POS{% endblock %}
+{% block page_title %}Add New Medicine{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-plus-circle"></i> Medicine Information
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Medicine Name *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Generic Name</label>
+                            <input type="text" class="form-control" name="generic_name">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Brand *</label>
+                            <input type="text" class="form-control" name="brand" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-control" name="category" list="categories">
+                            <datalist id="categories">
+                                <option value="Antibiotic">
+                                <option value="Painkiller">
+                                <option value="Vitamin">
+                                <option value="Antacid">
+                                <option value="Antiseptic">
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Supplier</label>
+                            <select class="form-select" name="supplier_id">
+                                <option value="">Select Supplier</option>
+                                {% for supplier in suppliers %}
+                                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Barcode</label>
+                            <input type="text" class="form-control" name="barcode">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Quantity *</label>
+                            <input type="number" class="form-control" name="quantity" required min="0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Reorder Level</label>
+                            <input type="number" class="form-control" name="reorder_level" value="10">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Cost Price</label>
+                            <input type="number" step="0.01" class="form-control" name="cost_price">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Selling Price *</label>
+                            <input type="number" step="0.01" class="form-control" name="price" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Expiry Date *</label>
+                            <input type="date" class="form-control" name="expiry_date" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Batch Number</label>
+                            <input type="text" class="form-control" name="batch_number">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Rack Location</label>
+                            <input type="text" class="form-control" name="rack_location" placeholder="A-1-5">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="requires_prescription" id="rxRequired">
+                        <label class="form-check-label" for="rxRequired">
+                            Requires Prescription
+                        </label>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('medicines') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Save Medicine
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

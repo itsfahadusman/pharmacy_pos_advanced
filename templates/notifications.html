@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><i class="bi bi-bell"></i> All Notifications</div>
+    <div class="card-body">
+        <div class="list-group">
+            {% for notif in notifications %}
+            <div class="list-group-item {% if not notif.is_read %}bg-light{% endif %}">
+                <div class="d-flex justify-content-between">
+                    <h6><span class="badge bg-{{ 'warning' if notif.type == 'low_stock' else 'danger' if notif.type == 'expired' else 'info' }}">{{ notif.type|title }}</span></h6>
+                    <small>{{ notif.created_at }}</small>
+                </div>
+                <p class="mb-0">{{ notif.message }}</p>
+                {% if not notif.is_read %}
+                <a href="{{ url_for('mark_notification_read', notif_id=notif.id) }}" class="btn btn-sm btn-outline-primary mt-2">Mark Read</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

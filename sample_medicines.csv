@@ -1,0 +1,11 @@
+name,generic_name,brand,category,quantity,reorder_level,cost_price,price,expiry_date,barcode,batch_number,rack_location,description,requires_prescription
+Paracetamol 500mg,Acetaminophen,Calpol,Painkiller,100,20,5.50,10.00,2026-12-31,8901234567890,BATCH001,A-1-5,For fever and pain relief,0
+Amoxicillin 250mg,Amoxicillin,Novamox,Antibiotic,50,15,15.00,25.00,2026-06-30,8901234567891,BATCH002,A-2-3,Broad spectrum antibiotic,1
+Cetirizine 10mg,Cetirizine,Zyrtec,Antihistamine,80,20,3.00,8.00,2027-03-15,8901234567892,BATCH003,B-1-2,For allergies,0
+Omeprazole 20mg,Omeprazole,Omez,Antacid,60,15,8.00,15.00,2026-09-20,8901234567893,BATCH004,A-3-1,For acidity and GERD,0
+Metformin 500mg,Metformin,Glycomet,Antidiabetic,90,25,4.50,12.00,2027-01-10,8901234567894,BATCH005,C-1-4,For diabetes type 2,1
+Azithromycin 500mg,Azithromycin,Azee,Antibiotic,40,10,25.00,45.00,2026-08-25,8901234567895,BATCH006,A-2-5,Macrolide antibiotic,1
+Vitamin C 500mg,Ascorbic Acid,HealthVit,Vitamin,120,30,2.00,6.00,2027-12-31,8901234567896,BATCH007,D-1-1,Immunity booster,0
+Ibuprofen 400mg,Ibuprofen,Brufen,Painkiller,70,20,6.00,12.00,2026-11-15,8901234567897,BATCH008,A-1-3,Anti-inflammatory painkiller,0
+Dettol Antiseptic,Chloroxylenol,Dettol,Antiseptic,50,10,85.00,120.00,2028-01-01,8901234567898,BATCH009,E-1-1,Antiseptic liquid,0
+Multivitamin,Mixed Vitamins,Revital,Vitamin,100,25,8.00,18.00,2027-06-30,8901234567899,BATCH010,D-1-2,Daily multivitamin,0

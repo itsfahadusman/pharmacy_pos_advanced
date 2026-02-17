@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><i class="bi bi-gear"></i> User Management</div>
+    <div class="card-body">
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addUserModal"><i class="bi bi-person-plus"></i> Add User</button>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th>Username</th><th>Full Name</th><th>Email</th><th>Role</th><th>Created</th></tr></thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr><td>{{ user.username }}</td><td>{{ user.full_name }}</td><td>{{ user.email or '-' }}</td><td><span class="badge bg-success">{{ user.role }}</span></td><td>{{ user.created_at }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addUserModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Add User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('add_user') }}">
+                    <div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" name="username" required></div>
+                    <div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" name="password" required></div>
+                    <div class="mb-3"><label class="form-label">Full Name</label><input type="text" class="form-control" name="full_name" required></div>
+                    <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" name="email"></div>
+                    <div class="mb-3"><label class="form-label">Role</label><select class="form-select" name="role"><option value="admin">Admin</option><option value="cashier">Cashier</option></select></div>
+                    <button type="submit" class="btn btn-success w-100">Create User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

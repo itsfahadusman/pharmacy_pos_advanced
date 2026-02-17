@@ -1,0 +1,44 @@
+REMAINING TEMPLATES TO CREATE (All follow similar Bootstrap 5 patterns):
+
+1. add_medicine.html - Form with all medicine fields
+2. edit_medicine.html - Same as add but pre-filled
+3. customers.html - Customer listing table
+4. add_customer.html - Customer form
+5. edit_customer.html - Customer edit form
+6. suppliers.html - Supplier listing
+7. add_supplier.html - Supplier form
+8. purchase_orders.html - PO listing
+9. create_po.html - Create PO with items
+10. sales_report.html - Sales report with date filters
+11. analytics.html - Charts and graphs (use Chart.js)
+12. low_stock.html - Low stock items table
+13. expired.html - Expired/expiring medicines
+14. inventory_adjustment.html - Stock adjustment form
+15. notifications.html - Notifications list
+16. activity_log.html - Activity log table
+17. settings.html - User management and settings
+
+TEMPLATE PATTERN:
+All templates extend base.html and include:
+- Page title block
+- Page header with icon
+- Card-based layout
+- Bootstrap forms/tables
+- Action buttons
+- Back navigation
+- Flash message support
+
+SAMPLE TEMPLATE STRUCTURE:
+{% extends 'base.html' %}
+{% block title %}Page Title - Pharmacy POS{% endblock %}
+{% block page_title %}Page Header{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-icon"></i> Section Title
+    </div>
+    <div class="card-body">
+        <!-- Content here -->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Inventory Adjustment{% endblock %}
+{% block page_title %}Adjust Inventory{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-sliders"></i> Stock Adjustment</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Medicine</label>
+                        <select class="form-select" name="medicine_id" required>
+                            <option value="">Select Medicine</option>
+                            {% for med in medicines %}
+                            <option value="{{ med.id }}">{{ med.name }} (Current: {{ med.quantity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adjustment Type</label>
+                        <select class="form-select" name="adjustment_type" required>
+                            <option value="add">Add Stock</option>
+                            <option value="subtract">Subtract Stock</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" name="quantity_change" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <textarea class="form-control" name="reason" rows="2" required></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('medicines') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success">Adjust Stock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Expired Medicines{% endblock %}
+{% block page_title %}Expired & Expiring Medicines{% endblock %}
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white"><i class="bi bi-x-circle"></i> Expired Medicines</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th>Medicine</th><th>Batch</th><th>Quantity</th><th>Expiry Date</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for med in expired %}
+                    <tr>
+                        <td><strong>{{ med.name }}</strong></td>
+                        <td>{{ med.batch_number or '-' }}</td>
+                        <td>{{ med.quantity }}</td>
+                        <td><span class="badge bg-danger">{{ med.expiry_date }}</span></td>
+                        <td><a href="{{ url_for('delete_medicine', med_id=med.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Remove expired medicine?')"><i class="bi bi-trash"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header bg-warning"><i class="bi bi-clock-history"></i> Expiring Soon (30 Days)</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th>Medicine</th><th>Batch</th><th>Quantity</th><th>Expiry Date</th></tr></thead>
+                <tbody>
+                    {% for med in expiring_soon %}
+                    <tr><td>{{ med.name }}</td><td>{{ med.batch_number or '-' }}</td><td>{{ med.quantity }}</td><td><span class="badge bg-warning">{{ med.expiry_date }}</span></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

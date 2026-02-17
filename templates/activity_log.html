@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Activity Log{% endblock %}
+{% block page_title %}System Activity Log{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><i class="bi bi-journal-text"></i> Recent Activity</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td><small>{{ log.timestamp }}</small></td>
+                        <td>{{ log.full_name }}</td>
+                        <td><span class="badge bg-primary">{{ log.action }}</span></td>
+                        <td><small>{{ log.details }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
