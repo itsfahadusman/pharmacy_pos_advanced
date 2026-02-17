@@ -8,18 +8,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import json
 import os
-import webbrowser
-import threading
 
 app = Flask(__name__)
-app.secret_key = 'pharmacy_advanced_secret_key_2024'
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.secret_key = os.environ.get('SECRET_KEY', 'pharmacy_advanced_secret_key_2024')
+
+# Use /tmp for Vercel (only writable directory in serverless)
+UPLOAD_FOLDER = '/tmp/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Ensure upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-DB = 'pharmacy.db'
+# Use /tmp for SQLite on Vercel (only writable directory)
+DB = '/tmp/pharmacy.db'
 
 # === Database Helper ===
 def get_db():
@@ -853,10 +855,10 @@ def import_medicines():
             
             # Show results
             if success_count > 0:
-                flash(f'✅ Successfully imported {success_count} medicines!', 'success')
+                flash(f'Successfully imported {success_count} medicines!', 'success')
             
             if error_count > 0:
-                flash(f'⚠️ {error_count} rows had errors. Check details below.', 'warning')
+                flash(f'{error_count} rows had errors. Check details below.', 'warning')
                 for error in errors[:10]:  # Show first 10 errors
                     flash(error, 'danger')
                 if len(errors) > 10:
@@ -971,12 +973,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    # Open browser in a separate thread after short delay
-    def open_browser():
-        webbrowser.open("http://127.0.0.1:5000")
-    
-    threading.Timer(1, open_browser).start()  # opens after 1 second
-    
-    # Start Flask app
-    app.run(host="127.0.0.1", port=5000)
-
+    app.run(debug=False)
